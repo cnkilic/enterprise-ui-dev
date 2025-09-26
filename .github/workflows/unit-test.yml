@@ -1,48 +1,63 @@
 name: Run Unit Tests
 
 on:
-  push:
-    branches: [main]
+  # Sadece actions'a açılan PR'larda tetikle
   pull_request:
-    branches: [main]
+    branches:
+      - actions
+    types: [opened, synchronize, reopened]
+
+  # (İstersen) push tetiklerini koru; istemiyorsan bu bloğu kaldır
+  push:
+    branches:
+      - main
+      - actions
 
 jobs:
   unit-test:
+    # PR ise head branch 'feature-can' değilse bu job SKIP olur
+    if: github.event_name != 'pull_request' || github.head_ref == 'feature-can'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        name: Checkout Repository 🫠
+      - name: Checkout Repository 🫠
+        uses: actions/checkout@v4
+
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: 'npm'
+
       - run: npm ci
       - run: npm test
+
   build:
+    if: github.event_name != 'pull_request' || github.head_ref == 'feature-can'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: 'npm'
       - run: npm ci
       - run: npm run build
+
   coverage:
+    if: github.event_name != 'pull_request' || github.head_ref == 'feature-can'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: 'npm'
       - run: npm ci
       - run: npm test -- --coverage --run
-      - uses: actions/upload-artifact@v3
-        name: Archive coverage report
+      - name: Archive coverage report
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-report
           path: coverage

@@ -3,7 +3,7 @@ T
 
 # Introduction
 
-# Test Can
+# Test Can 2
 
 What is this course all about? What do you need? What technologies are we going to be using? What do I need to have installed?
 
